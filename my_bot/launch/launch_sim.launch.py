@@ -22,9 +22,9 @@ def generate_launch_description():
     rsp = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory(package_name),'launch','rsp.launch.py'
-                )]), launch_arguments={'use_sim_time': 'true'}.items()
+                )]), launch_arguments={'use_sim_time': 'true','use_ros2_control':'false'}.items()
     )
-    
+
     gazebo_params_file = os.path.join(
         get_package_share_directory(package_name), 'config', 'gazebo_params.yaml'
     )
@@ -42,21 +42,21 @@ def generate_launch_description():
                                    '-entity', 'my_bot'],
                         output='screen')
     
-    # time.sleep(0.1)
+    time.sleep(2)
     diff_drive_spawner = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['diff_cont'],
     )
 
-    # time.sleep(0.1)
+    time.sleep(0.5)
     joint_broad_spawner = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['joint_broad'],
     )
     
-    time.sleep(2)  # wait for Gazebo to load
+    time.sleep(0.5)  # wait for Gazebo to load
     # Launch them all!
     return LaunchDescription([
         rsp,

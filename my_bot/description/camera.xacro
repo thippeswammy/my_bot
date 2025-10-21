@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:property name="pi" value="3.141592653589793" unless="pi"/>
-
     <joint name="camera_joint" type="fixed">
         <parent link="chassis"/>
         <child link="camera_link"/>
