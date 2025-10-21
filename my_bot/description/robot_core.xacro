@@ -3,8 +3,6 @@
 
     <xacro:include filename="inertial_macros.xacro"/>
 
-    <!-- <xacro:property name="pi" value="3.14159265359"/> -->
-
     <material name="white">
         <color rgba="1 1 1 1"/>
     </material>
@@ -30,6 +28,15 @@
 
     </link>
 
+    <!-- BASE FOOTPRINT LINK -->
+    <joint name="base_footprint_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="base_footprint"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="base_footprint">
+    </link>
 
     <!-- CHASSIS link -->
     <joint name="chassis_joint" type="fixed">
@@ -53,7 +60,7 @@
             </geometry>    
             <material name="orange"/>
         </collision>
-        <xacro:inertial_box mass="0.5" x="0.3" y="0.3" z="0.15">
+        <xacro:inertial_box mass="0.3" x="0.3" y="0.3" z="0.15">
             <origin xyz="0.15 0 0.075" rpy="0 0 0"/>
         </xacro:inertial_box>
     </link>
@@ -74,19 +81,19 @@
     <link name="left_wheel">
         <visual>
             <geometry>
-                <cylinder length="0.02" radius="0.05"/>
+                <cylinder length="0.01" radius="0.05"/>
             </geometry>
             <material name="blue"/>
         </visual>
         <collision>
             <geometry>
-                <cylinder length="0.02" radius="0.05"/>
+                <sphere radius="0.05"/>
             </geometry>
             <material name="blue"/>
         </collision>
-        <xacro:inertial_cylinder mass="0.1" length="0.02" radius="0.05">
+        <xacro:inertial_sphere mass="0.1" radius="0.05">
             <origin xyz="0 0 0" rpy="0 0 0"/>
-        </xacro:inertial_cylinder>
+        </xacro:inertial_sphere>
     </link>
     <gazebo reference="left_wheel">
         <material>Gazebo/Blue </material>
@@ -103,19 +110,19 @@
     <link name="right_wheel">
         <visual>
             <geometry>
-                <cylinder length="0.02" radius="0.05"/>
+                <cylinder length="0.01" radius="0.05"/>
             </geometry>
             <material name="blue"/>
         </visual>
         <collision>
             <geometry>
-                <cylinder length="0.02" radius="0.05"/>
+                <sphere radius="0.05"/>
             </geometry>
             <material name="blue"/>
         </collision>
-        <xacro:inertial_cylinder mass="0.1" length="0.02" radius="0.05">
+        <xacro:inertial_sphere mass="0.1" radius="0.05">
             <origin xyz="0 0 0" rpy="0 0 0"/>
-        </xacro:inertial_cylinder>
+        </xacro:inertial_sphere>
     </link>
     <gazebo reference="right_wheel">
         <material>Gazebo/Blue </material>

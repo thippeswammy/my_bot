@@ -43,8 +43,9 @@
             <!-- Wheel Information -->
             <left_joint>left_wheel_joint</left_joint>
             <right_joint>right_wheel_joint</right_joint>
-            <wheel_separation>0.23</wheel_separation>
-            <wheel_diameter>0.1</wheel_diameter>
+            <!-- Match the controller configuration: separation in meters, diameter = 2 * wheel_radius -->
+            <wheel_separation>0.297</wheel_separation>
+            <wheel_diameter>0.066</wheel_diameter>
 
             <!-- Limits -->
             <max_wheel_torque>200.0</max_wheel_torque>
@@ -54,8 +55,10 @@
             <odometry_frame>odom</odometry_frame>
             <robot_base_frame>base_link</robot_base_frame>
 
-            <publish_odom>true</publish_odom>
-            <publish_odom_tf>true</publish_odom_tf>
+          <!-- Disable Gazebo-side odometry publication to avoid duplicate/conflicting odom/TF.
+              Let the diff_drive_controller (ros2_control) publish odometry/TF. -->
+          <publish_odom>true</publish_odom>
+          <publish_odom_tf>true</publish_odom_tf>
             <publish_wheel_tf>true</publish_wheel_tf>
         </plugin>
     </gazebo>
