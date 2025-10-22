@@ -8,6 +8,7 @@ from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
+    """Generate the launch description for the SLAM toolbox node."""
     use_sim_time = LaunchConfiguration('use_sim_time')
     slam_params_file = LaunchConfiguration('slam_params_file')
 
