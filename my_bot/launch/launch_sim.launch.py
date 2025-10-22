@@ -25,6 +25,20 @@ def generate_launch_description():
                 )]), launch_arguments={'use_sim_time': 'true','use_ros2_control':'true'}.items()
     )
 
+    # joystick = IncludeLaunchDescription(
+    #             PythonLaunchDescriptionSource([os.path.join(
+    #                 get_package_share_directory(package_name),'launch','joystick.launch.py'
+    #             )]), launch_arguments={'use_sim_time': 'true'}.items()
+    # )
+
+    twist_mux_params = os.path.join(get_package_share_directory(package_name),'config','twist_mux.yaml')
+    twist_mux = Node(
+            package="twist_mux",
+            executable="twist_mux",
+            parameters=[twist_mux_params, {'use_sim_time': True}],
+            remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
+        )
+
     gazebo_params_file = os.path.join(
         get_package_share_directory(package_name), 'config', 'gazebo_params.yaml'
     )
@@ -42,24 +56,23 @@ def generate_launch_description():
                                    '-entity', 'my_bot'],
                         output='screen')
     
-    time.sleep(2)
+
     diff_drive_spawner = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['diff_cont'],
     )
 
-    time.sleep(0.5)
     joint_broad_spawner = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['joint_broad'],
     )
     
-    time.sleep(0.5)  # wait for Gazebo to load
     # Launch them all!
     return LaunchDescription([
         rsp,
+        twist_mux,
         gazebo,
         spawn_entity,
         diff_drive_spawner,
