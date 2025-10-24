@@ -16,9 +16,8 @@ ros2 run nav2_util lifecycle_bringup amcl
 ros2 run twist_mux twist_mux --ros-args --params-file ./scr/my_bot/config/twist_mux.yaml -r cmd_vel_out:=diff_cont/cmd_vel_unstamped
 
 
-________
+______________________________________________________________
 
-ros2 run twist_mux twist_mux --ros-args --params-file ./scr/my_bot/config/twist_mux.yaml -r cmd_vel_out:=diff_cont/cmd_vel_unstamped
 
 ros2 launch my_bot launch_sim.launch.py world:=./scr/my_bot/worlds/obstacles.world
 
@@ -26,6 +25,12 @@ ros2 launch slam_toolbox online_async_launch.py slam_params_file:=./scr/my_bot/c
 
 ros2 launch nav2_bringup navigation_launch.py use_sim_time:=true
 
+ros2 run twist_mux twist_mux --ros-args --params-file ./scr/my_bot/config/twist_mux.yaml -r cmd_vel_out:=diff_cont/cmd_vel_unstamped
+
 rviz2
 
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-arg -r /cmd_vel:=/diff_cont/cmd_vel_unstamped
+chmod +x start_nav2.sh
+./start_nav2.sh
+
+
+# ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-arg -r /cmd_vel:=/diff_cont/cmd_vel_unstamped
