@@ -18,7 +18,13 @@
     </xacro:unless>
 
     <!-- Sensors -->
+    <!-- changing -->
     <xacro:include filename="lidar.xacro"/>  
+    <xacro:include filename="VLP-16.urdf.xacro"/>  
+    <!-- Instantiate the VLP-16 sensor, connected to the chassis -->
+    <xacro:VLP-16 parent="chassis" name="velodyne_vlp16" topic="/velodyne_points" hz="10">
+        <origin xyz="0.1 0 0.195" rpy="0 0 0"/>
+    </xacro:VLP-16>
     <xacro:include filename="camera.xacro"/>   
     <xacro:include filename="depth_camera.xacro"/> 
 
