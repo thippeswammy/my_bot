@@ -23,9 +23,19 @@
     <xacro:include filename="VLP-16.urdf.xacro"/>  
     <!-- Instantiate the VLP-16 sensor, connected to the chassis -->
     <xacro:VLP-16 parent="chassis" name="velodyne_vlp16" topic="/velodyne_points" hz="10">
-        <origin xyz="0.1 0 0.195" rpy="0 0 0"/>
+        <origin xyz="0.15 0 0.195" rpy="0 0 0"/>
     </xacro:VLP-16>
     <xacro:include filename="camera.xacro"/>   
     <xacro:include filename="depth_camera.xacro"/> 
+
+    <!-- IMU Sensor -->
+    <xacro:include filename="xsens_mti._imu.urdf.xacro"/>
+    <xacro:xsens_imu_mti
+        parent_link="chassis"
+        imu_name="imu_sensor"
+        topic_name="/imu/data"
+        xyz="0 0 0.15"
+        rpy="0 0 0"
+    />
 
 </robot>
