@@ -5,6 +5,12 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import PythonExpression
 
 def generate_launch_description():
+    frame_id_arg = DeclareLaunchArgument(
+        'frame_id',
+        default_value='map',
+        description='Frame ID for Octomap'
+    )
+
     map_path_arg = DeclareLaunchArgument(
         'map_path',
         default_value='',

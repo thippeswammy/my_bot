@@ -4,6 +4,8 @@ from PIL import Image
 import os
 
 def generate_heightmap(filename, width=513, height=513):
+    # Set seed for deterministic noise
+    np.random.seed(42)
     # Create a blank image
     img = np.zeros((height, width), dtype=np.uint8)
 
