@@ -40,7 +40,8 @@ def generate_launch_description():
     lidarslam_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_my_bot_3d_nav, 'launch', 'lidarslam_mapping.launch.py')
-        )
+        ),
+        launch_arguments={'use_sim_time': use_sim_time}.items()
     )
 
     # 3. Launch Navigation2

@@ -15,12 +15,21 @@ def generate_launch_description():
         description='Full path to main parameter file to load'
     )
 
+    use_sim_time_arg = DeclareLaunchArgument(
+        'use_sim_time',
+        default_value='true',
+        description='Use simulation (Gazebo) clock if true'
+    )
+
     # Scan Matcher
     scan_matcher = Node(
         package='scanmatcher',
         executable='scanmatcher_node',
-        parameters=[LaunchConfiguration('main_param_dir')],
-        remappings=[('/input_cloud', '/velodyne_points')],
+        parameters=[
+            LaunchConfiguration('main_param_dir'),
+            {'use_sim_time': LaunchConfiguration('use_sim_time')}
+        ],
+        remappings=[('/input_cloud', '/velodyne_points'), ('/map', '/map_cloud')],
         output='screen'
     )
 
@@ -28,12 +37,16 @@ def generate_launch_description():
     graph_based_slam = Node(
         package='graph_based_slam',
         executable='graph_based_slam_node',
-        parameters=[LaunchConfiguration('main_param_dir')],
+        parameters=[
+            LaunchConfiguration('main_param_dir'),
+            {'use_sim_time': LaunchConfiguration('use_sim_time')}
+        ],
         output='screen'
     )
     
     return LaunchDescription([
         main_param_dir_arg,
+        use_sim_time_arg,
         scan_matcher,
         graph_based_slam,
     ])
