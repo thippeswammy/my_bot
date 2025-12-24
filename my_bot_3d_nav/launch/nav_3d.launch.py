@@ -109,12 +109,30 @@ def generate_launch_description():
         "'map' if '", use_slam, "' == 'true' else 'odom'"
     ])
     
+    declare_map_file_cmd = DeclareLaunchArgument(
+        'map_file',
+        default_value='',
+        description='Full path to .bt OctoMap file to load (optional)')
+
+    # ... (in LaunchDescription list) ...
+    
+    # Logic: 
+    # 1. Launch Octomap if enable_3d_mapping is TRUE (Live Mapping)
+    # 2. Launch Octomap if map_file is present (Static Map loading)
+    # 3. If enable_3d_mapping is FALSE but map_file is present, load map but don't subscribe to cloud (Static Navigation)
+    
+    should_launch_octomap = PythonExpression([
+        "'", enable_3d_mapping, "' == 'true' or '", LaunchConfiguration('map_file'), "' != ''"
+    ])
+
     start_mapping_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(mapping_launch_path),
-        condition=IfCondition(enable_3d_mapping),
+        condition=IfCondition(should_launch_octomap),
         launch_arguments={
             'use_sim_time': use_sim_time,
-            'frame_id': mapping_frame
+            'frame_id': mapping_frame,
+            'map_path': LaunchConfiguration('map_file'),
+            'enable_mapping': enable_3d_mapping
         }.items()
     )
 
@@ -135,6 +153,7 @@ def generate_launch_description():
         declare_enable_3d_mapping_cmd,
         declare_use_slam_cmd,
         declare_world_cmd,
+        declare_map_file_cmd,
         launch_sim,
         delayed_nav_launch
     ])

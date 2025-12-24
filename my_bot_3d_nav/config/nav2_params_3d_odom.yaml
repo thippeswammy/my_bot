@@ -198,7 +198,7 @@ global_costmap:
         z_voxels: 100
         max_obstacle_height: 10.0
         mark_threshold: 0
-        observation_sources: pointcloud
+        observation_sources: pointcloud static_cloud
         pointcloud:
           topic: /velodyne_points
           max_obstacle_height: 3.0
@@ -209,6 +209,17 @@ global_costmap:
           raytrace_max_range: 8.0
           raytrace_min_range: 0.0
           obstacle_max_range: 7.5
+          obstacle_min_range: 0.0
+        static_cloud:
+          topic: /octomap_point_cloud_centers
+          max_obstacle_height: 10.0
+          min_obstacle_height: -0.5
+          clearing: False
+          marking: True
+          data_type: "PointCloud2"
+          raytrace_max_range: 10.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 10.0
           obstacle_min_range: 0.0
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
@@ -300,7 +311,7 @@ velocity_smoother:
     min_velocity: [-0.26, 0.0, -1.0]
     max_accel: [2.5, 0.0, 3.2]
     max_decel: [-2.5, 0.0, -3.2]
-    odom_topic: "odom"
+    odom_topic: "/diff_cont/odom"
     odom_duration: 0.1
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0
