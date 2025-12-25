@@ -22,7 +22,8 @@ def generate_launch_description():
     # Launch configuration variables specific to simulation
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     enable_3d_mapping = LaunchConfiguration('enable_3d_mapping', default='false')
-    use_slam = LaunchConfiguration('use_slam', default='true')
+    # Replaced use_slam with slam_type for more granularity
+    slam_type = LaunchConfiguration('slam_type', default='2d') # Options: 'none', '2d', '3d'
     world = LaunchConfiguration('world', default=world_path)
 
     # Declare the launch arguments
@@ -36,10 +37,10 @@ def generate_launch_description():
         default_value='false',
         description='Enable Octomap 3D mapping')
 
-    declare_use_slam_cmd = DeclareLaunchArgument(
-        'use_slam',
-        default_value='true',
-        description='Enable SLAM (true) or use Odom-only (false)')
+    declare_slam_type_cmd = DeclareLaunchArgument(
+        'slam_type',
+        default_value='2d',
+        description='SLAM type to use: "none" (Odom), "2d" (Slam Toolbox), "3d" (LidarSLAM)')
 
     declare_world_cmd = DeclareLaunchArgument(
         'world',
@@ -54,18 +55,15 @@ def generate_launch_description():
         launch_arguments={'world': world}.items()
     )
 
-    # Select params file based on use_slam
+    # Select params file based on slam_type
+    # If 2d or 3d SLAM is used, we generally use the SLAM-compatible nav params (map frame)
+    # If slam_type is 'none', we use odom params.
     from launch.substitutions import PythonExpression
     params_file = PythonExpression([
-        "'", nav_params_path, "' if '", use_slam, "' == 'true' else '", nav_params_odom_path, "'"
+        "'", nav_params_path, "' if '", slam_type, "' in ['2d', '3d'] else '", nav_params_odom_path, "'"
     ])
 
     # Include the navigation stack
-    # Note: We are using navigation_launch.py from nav2_bringup, which brings up the entire nav stack
-    # but NOT the map server (by default) or localization (amcl) if we are doing SLAM or checking defaults.
-    # Wait, navigation_launch.py brings up Lifecycle Manager for navigation, controller, planner, behaviors, smoother, velocity smoother.
-    # It DOES NOT bring up AMCL or Map Server.
-    
     bringup_nav = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_nav2_bringup, 'launch', 'navigation_launch.py')
@@ -76,16 +74,28 @@ def generate_launch_description():
         }.items()
     )
 
-    # Include SLAM Toolbox (Conditionally)
+    # 2D SLAM Toolbox (Conditionally)
+    # Launch only if slam_type == '2d'
     from launch.conditions import IfCondition
     slam_toolbox = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_slam_toolbox, 'launch', 'online_async_launch.py')
         ),
-        condition=IfCondition(use_slam),
+        condition=IfCondition(PythonExpression(["'", slam_type, "' == '2d'"])),
         launch_arguments={
             'use_sim_time': use_sim_time,
             'slam_params_file': slam_params_path
+        }.items()
+    )
+
+    # 3D SLAM (LidarSLAM) (Conditionally)
+    # Launch only if slam_type == '3d'
+    lidarslam_launch_path = os.path.join(pkg_my_bot_3d_nav, 'launch', 'lidarslam_mapping.launch.py')
+    lidarslam = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(lidarslam_launch_path),
+        condition=IfCondition(PythonExpression(["'", slam_type, "' == '3d'"])),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
         }.items()
     )
 
@@ -103,24 +113,25 @@ def generate_launch_description():
     )
     
     # Octomap Mapping
-    # Logic: Only launch if enable_3d_mapping is true
-    # Mapping frame depends on SLAM (map) or Odom-Only (odom)
-    mapping_frame = PythonExpression([
-        "'map' if '", use_slam, "' == 'true' else 'odom'"
+    # Logic: 
+    # - If slam_type == '3d', we might NOT want Octomap if LidarSLAM provides a map, 
+    #   BUT Octomap is often used for the Costmap interaction specifically if LidarSLAM outputs a PointCloud2 map.
+    #   LidarSLAM outputs /map (Occupancy/Grid?) and /map_cloud.
+    #   For now, we keep Octomap as the "Mapping via Octomap" feature, controlled by enable_3d_mapping.
+    
+    mapping_frame = 'map' # Default to map if SLAM is on.
+    # If slam_type == 'none', use odom.
+    mapping_frame_exp = PythonExpression([
+        "'map' if '", slam_type, "' in ['2d', '3d'] else 'odom'"
     ])
+
     
     declare_map_file_cmd = DeclareLaunchArgument(
         'map_file',
         default_value='',
         description='Full path to .bt OctoMap file to load (optional)')
 
-    # ... (in LaunchDescription list) ...
-    
-    # Logic: 
-    # 1. Launch Octomap if enable_3d_mapping is TRUE (Live Mapping)
-    # 2. Launch Octomap if map_file is present (Static Map loading)
-    # 3. If enable_3d_mapping is FALSE but map_file is present, load map but don't subscribe to cloud (Static Navigation)
-    
+    # Logic for Octomap launch matches previous:
     should_launch_octomap = PythonExpression([
         "'", enable_3d_mapping, "' == 'true' or '", LaunchConfiguration('map_file'), "' != ''"
     ])
@@ -130,7 +141,7 @@ def generate_launch_description():
         condition=IfCondition(should_launch_octomap),
         launch_arguments={
             'use_sim_time': use_sim_time,
-            'frame_id': mapping_frame,
+            'frame_id': mapping_frame_exp,
             'map_path': LaunchConfiguration('map_file'),
             'enable_mapping': enable_3d_mapping
         }.items()
@@ -143,6 +154,7 @@ def generate_launch_description():
         actions=[
             bringup_nav,
             slam_toolbox,
+            lidarslam,
             start_mapping_cmd,
             start_rviz_cmd
         ]
@@ -151,7 +163,7 @@ def generate_launch_description():
     return LaunchDescription([
         declare_use_sim_time_cmd,
         declare_enable_3d_mapping_cmd,
-        declare_use_slam_cmd,
+        declare_slam_type_cmd,
         declare_world_cmd,
         declare_map_file_cmd,
         launch_sim,

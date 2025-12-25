@@ -29,7 +29,7 @@ def generate_launch_description():
             LaunchConfiguration('main_param_dir'),
             {'use_sim_time': LaunchConfiguration('use_sim_time')}
         ],
-        remappings=[('/input_cloud', '/velodyne_points'), ('/map', '/map_cloud')],
+        remappings=[('/input_cloud', '/velodyne_points'), ('/map', '/map_cloud'), ('/odom', '/diff_cont/odom')],
         output='screen'
     )
 
