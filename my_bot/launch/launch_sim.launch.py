@@ -4,7 +4,8 @@ from ament_index_python.packages import get_package_share_directory
 import time
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node
@@ -39,6 +40,14 @@ def generate_launch_description():
             remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
         )
 
+    # Declare the launch arguments
+    declare_world_cmd = DeclareLaunchArgument(
+        'world',
+        default_value='',
+        description='Full path to world model file to load')
+        
+    world = LaunchConfiguration('world')
+
     gazebo_params_file = os.path.join(
         get_package_share_directory(package_name), 'config', 'gazebo_params.yaml'
     )
@@ -47,13 +56,14 @@ def generate_launch_description():
     gazebo = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
-                    launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file}.items()
+                    launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file, 'world': world}.items()
              )
 
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-topic', 'robot_description',
-                                   '-entity', 'my_bot'],
+                                   '-entity', 'my_bot',
+                                   '-z', '2.0'],
                         output='screen')
     
 
@@ -61,16 +71,19 @@ def generate_launch_description():
         package='controller_manager',
         executable='spawner',
         arguments=['diff_cont'],
+        parameters=[{'use_sim_time': True}],
     )
 
     joint_broad_spawner = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['joint_broad'],
+        parameters=[{'use_sim_time': True}],
     )
     
     # Launch them all!
     return LaunchDescription([
+        declare_world_cmd,
         rsp,
         twist_mux,
         gazebo,
