@@ -17,7 +17,7 @@ def generate_launch_description():
     # --clock publishes /clock for simulation time
     # -r 0.5 slows down playback to allow SLAM to process without TF lag
     play_bag = ExecuteProcess(
-        cmd=['ros2', 'bag', 'play', LaunchConfiguration('bag_file'), '--clock', '-r', '0.5'],
+        cmd=['ros2', 'bag', 'play', LaunchConfiguration('bag_file'), '--clock', '-r', '1.0'],
         output='screen'
     )
 

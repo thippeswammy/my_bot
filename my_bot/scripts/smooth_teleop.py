@@ -32,7 +32,7 @@ CTRL-C to quit
 
 def getKey(settings):
     tty.setraw(sys.stdin.fileno())
-    rlist, _, _ = select.select([sys.stdin], [], [], 0.1) 
+    rlist, _, _ = select.select([sys.stdin], [], [], 0.01) 
     if rlist:
         key = sys.stdin.read(1)
     else:
@@ -51,7 +51,7 @@ class SmoothTeleop(Node):
         self.settings = termios.tcgetattr(sys.stdin)
         self.last_key_time = time.time()
         
-        self.timer = self.create_timer(0.1, self.loop) # 10hZ control loop
+        self.timer = self.create_timer(0.05, self.loop) # 20Hz control loop
         print(msg)
 
     def loop(self):
@@ -76,9 +76,14 @@ class SmoothTeleop(Node):
             
             # If no key pressed for a short duration, stop
             # This handles the gap between key repeats to avoid stuttering
-            if time.time() - self.last_key_time > 0.2:
+            # If no key pressed for a short duration, decay speed
+            # Use 0.5s timeout to handle slower key repeats or network lag
+            if time.time() - self.last_key_time > 0.5:
                  self.target_linear = 0.0
                  self.target_angular = 0.0
+                 # TODO: Could implement real decay here (e.g. self.target_linear *= DECAY)
+                 # but for now, just increasing the timeout should fix the stuttering.
+
 
             twist = Twist()
             twist.linear.x = float(self.target_linear)
