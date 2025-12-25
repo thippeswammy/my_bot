@@ -108,8 +108,65 @@
     <!-- Create 4 Wheels -->
     <xacro:wheel_link prefix="rear_left" offset_x="-0.2" offset_y="0.25"/>
     <xacro:wheel_link prefix="rear_right" offset_x="-0.2" offset_y="-0.25"/>
-    <xacro:wheel_link prefix="front_left" offset_x="0.2" offset_y="0.25"/>
-    <xacro:wheel_link prefix="front_right" offset_x="0.2" offset_y="-0.25"/>
+
+    <!-- FRONT CASTER WHEELS (Passive, Low Friction) -->
+    <joint name="front_left_caster_joint" type="fixed">
+        <parent link="chassis"/>
+        <child link="front_left_caster"/>
+        <origin xyz="0.2 0.25 -0.05" rpy="0 0 0"/>
+    </joint>
+
+    <link name="front_left_caster">
+        <visual>
+            <geometry>
+                <sphere radius="0.05"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="0.05"/>
+            </geometry>
+            <material name="black"/>
+        </collision>
+        <xacro:inertial_sphere mass="0.1" radius="0.05">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_sphere>
+    </link>
+    <gazebo reference="front_left_caster">
+        <material>Gazebo/Black</material>
+        <mu1 value="0.001"/>
+        <mu2 value="0.001"/>
+    </gazebo>
+
+    <joint name="front_right_caster_joint" type="fixed">
+        <parent link="chassis"/>
+        <child link="front_right_caster"/>
+        <origin xyz="0.2 -0.25 -0.05" rpy="0 0 0"/>
+    </joint>
+
+    <link name="front_right_caster">
+        <visual>
+            <geometry>
+                <sphere radius="0.05"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="0.05"/>
+            </geometry>
+            <material name="black"/>
+        </collision>
+        <xacro:inertial_sphere mass="0.1" radius="0.05">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_sphere>
+    </link>
+    <gazebo reference="front_right_caster">
+        <material>Gazebo/Black</material>
+        <mu1 value="0.001"/>
+        <mu2 value="0.001"/>
+    </gazebo>
 
     <!-- Remove Caster Wheel -->
 

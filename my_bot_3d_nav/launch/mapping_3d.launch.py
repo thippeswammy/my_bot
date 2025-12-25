@@ -2,6 +2,7 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument
+from launch.substitutions import PythonExpression
 
 def generate_launch_description():
     frame_id_arg = DeclareLaunchArgument(
@@ -10,8 +11,28 @@ def generate_launch_description():
         description='Frame ID for Octomap'
     )
 
+    map_path_arg = DeclareLaunchArgument(
+        'map_path',
+        default_value='',
+        description='Path to .bt map file to load'
+    )
+
+    enable_mapping_arg = DeclareLaunchArgument(
+        'enable_mapping',
+        default_value='true',
+        description='Whether to subscribe to pointcloud and update map'
+    )
+    
+    # If enable_mapping is 'true', subscribe to /velodyne_points.
+    # If 'false', subscribe to /dummy_cloud required to just read static map.
+    cloud_remap_topic = PythonExpression([
+        "'/velodyne_points' if '", LaunchConfiguration('enable_mapping'), "' == 'true' else '/octomap/idle'"
+    ])
+
     return LaunchDescription([
         frame_id_arg,
+        map_path_arg,
+        enable_mapping_arg,
         Node(
             package='octomap_server',
             executable='octomap_server_node',
@@ -26,10 +47,11 @@ def generate_launch_description():
                 'sensor_model/min': 0.12,
                 'sensor_model/max': 0.97,
                 'data_type': 'PointCloud2',
-                'base_frame_id': 'base_link'
+                'base_frame_id': 'base_link',
+                'octomap_path': LaunchConfiguration('map_path')
             }],
             remappings=[
-                ('cloud_in', '/velodyne_points')
+                ('cloud_in', cloud_remap_topic)
             ]
         )
     ])

@@ -11,7 +11,6 @@ Panels:
         - /RobotModel1/Description Topic1
         - /LaserScan1
         - /Depth_Image1
-        - /PointCloud21
       Splitter Ratio: 0.5
     Tree Height: 487
   - Class: rviz_common/Selection
@@ -31,7 +30,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: VLP 16
 Visualization Manager:
   Class: ""
   Displays:
@@ -58,13 +57,13 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        base_footprint:
+          Value: true
         base_link:
           Value: true
         camera_link:
           Value: true
         camera_link_optical:
-          Value: true
-        caster_wheel:
           Value: true
         chassis:
           Value: true
@@ -72,13 +71,21 @@ Visualization Manager:
           Value: true
         depth_camera_link_optical:
           Value: true
-        laser_frame:
+        front_left_caster:
           Value: true
-        left_wheel:
+        front_right_caster:
+          Value: true
+        laser_frame:
           Value: true
         odom:
           Value: true
-        right_wheel:
+        rear_left_wheel:
+          Value: true
+        rear_right_wheel:
+          Value: true
+        velodyne_vlp16:
+          Value: true
+        velodyne_vlp16_base_link:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -88,20 +95,27 @@ Visualization Manager:
       Tree:
         odom:
           base_link:
+            base_footprint:
+              {}
             chassis:
               camera_link:
                 camera_link_optical:
                   {}
-              caster_wheel:
-                {}
               depth_camera_link:
                 depth_camera_link_optical:
                   {}
+              front_left_caster:
+                {}
+              front_right_caster:
+                {}
               laser_frame:
                 {}
-            left_wheel:
+              velodyne_vlp16_base_link:
+                velodyne_vlp16:
+                  {}
+            rear_left_wheel:
               {}
-            right_wheel:
+            rear_right_wheel:
               {}
       Update Interval: 0
       Value: true
@@ -123,6 +137,10 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         base_link:
           Alpha: 1
           Show Axes: false
@@ -136,11 +154,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        caster_wheel:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         chassis:
           Alpha: 1
           Show Axes: false
@@ -155,17 +168,37 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        front_left_caster:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_caster:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         laser_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        left_wheel:
+        rear_left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        right_wheel:
+        rear_right_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        velodyne_vlp16:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        velodyne_vlp16_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -238,7 +271,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /depth_camera/depth/image_raw
+        Value: /depth_camera/image_raw
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -255,10 +288,10 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 255
+      Max Intensity: 0
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: Live Lidar
+      Name: VLP 16
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
@@ -296,7 +329,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.05
+      Size (m): 0.05000000074505806
       Style: Points
       Topic:
         Depth: 5
@@ -308,7 +341,7 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
-    - Alpha: 0.7
+    - Alpha: 0.699999988079071
       Class: rviz_default_plugins/Map
       Color Scheme: map
       Draw Behind: false
@@ -317,6 +350,7 @@ Visualization Manager:
       Topic:
         Depth: 5
         Durability Policy: Volatile
+        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /global_costmap/costmap
@@ -326,8 +360,9 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /global_costmap/costmap_updates
+      Use Timestamp: false
       Value: true
-    - Alpha: 0.7
+    - Alpha: 0.699999988079071
       Class: rviz_default_plugins/Map
       Color Scheme: costmap
       Draw Behind: false
@@ -336,6 +371,7 @@ Visualization Manager:
       Topic:
         Depth: 5
         Durability Policy: Volatile
+        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /local_costmap/costmap
@@ -345,17 +381,18 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /local_costmap/costmap_updates
+      Use Timestamp: false
       Value: true
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
       Color: 25; 255; 0
       Enabled: true
-      Head Diameter: 0.3
-      Head Length: 0.2
-      Length: 0.3
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
       Line Style: Lines
-      Line Width: 0.03
+      Line Width: 0.029999999329447746
       Name: Global Plan
       Offset:
         X: 0
@@ -363,12 +400,13 @@ Visualization Manager:
         Z: 0
       Pose Color: 255; 85; 255
       Pose Style: None
-      Radius: 0.03
-      Shaft Diameter: 0.1
-      Shaft Length: 0.1
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
       Topic:
         Depth: 5
         Durability Policy: Volatile
+        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /plan
@@ -376,7 +414,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: map
+    Fixed Frame: odom
     Frame Rate: 30
   Name: root
   Tools:
@@ -434,10 +472,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.38539838790893555
+      Pitch: 0.1453983634710312
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.2904012203216553
+      Yaw: 4.835412979125977
     Saved: ~
 Window Geometry:
   Depth_Image:
