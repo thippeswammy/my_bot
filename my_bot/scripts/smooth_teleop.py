@@ -51,7 +51,7 @@ class SmoothTeleop(Node):
         self.settings = termios.tcgetattr(sys.stdin)
         self.last_key_time = time.time()
         
-        self.timer = self.create_timer(0.05, self.loop) # 20Hz control loop
+        self.timer = self.create_timer(0.02, self.loop) # 50Hz control loop
         print(msg)
 
     def loop(self):

@@ -11,6 +11,11 @@ find_package(my_bot REQUIRED)
 find_package(nav2_bringup REQUIRED)
 find_package(nav2_common REQUIRED)
 find_package(rviz2 REQUIRED)
+find_package(grid_map_ros REQUIRED)
+find_package(grid_map_msgs REQUIRED)
+find_package(grid_map_pcl REQUIRED)
+find_package(pcl_conversions REQUIRED)
+find_package(PCL REQUIRED COMPONENTS common io filters)
 
 install(DIRECTORY
   launch
@@ -19,9 +24,26 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
 )
 
+add_executable(traversability_loader src/traversability_loader.cpp)
+ament_target_dependencies(traversability_loader
+  rclcpp
+  grid_map_ros
+  grid_map_msgs
+  grid_map_pcl
+  pcl_conversions
+)
+# PCL is a system dependency, link it slightly differently usually, but let's try standard include
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+target_link_libraries(traversability_loader ${PCL_LIBRARIES})
+
+install(TARGETS traversability_loader
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(PROGRAMS
   scripts/save_3d_map.sh
-  scripts/record_data.sh
   DESTINATION lib/${PROJECT_NAME}
 )
 
