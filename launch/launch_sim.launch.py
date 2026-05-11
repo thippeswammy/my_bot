@@ -61,12 +61,14 @@ def generate_launch_description():
         package='controller_manager',
         executable='spawner',
         arguments=['diff_cont'],
+        parameters=[{'use_sim_time': True}],
     )
 
     joint_broad_spawner = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['joint_broad'],
+        parameters=[{'use_sim_time': True}],
     )
     
     # Launch them all!
