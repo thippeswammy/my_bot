@@ -21,7 +21,8 @@ CMD1="source /opt/ros/$ROS_DISTRO/setup.bash; source $WORKSPACE/install/setup.ba
 
 # 2. Nav2 Bringup (Map Server + AMCL + Navigation)
 MAP_FILE=$WORKSPACE/src/my_bot/my_map/map2/my_map_save2.yaml
-CMD2="source /opt/ros/$ROS_DISTRO/setup.bash; source $WORKSPACE/install/setup.bash; echo '📍 Launching Localization & Navigation...'; ros2 launch nav2_bringup bringup_launch.py use_sim_time:=true map:=$MAP_FILE; exec bash"
+PARAMS_FILE=$WORKSPACE/src/my_bot/config/nav2_params.yaml
+CMD2="source /opt/ros/$ROS_DISTRO/setup.bash; source $WORKSPACE/install/setup.bash; echo '📍 Launching Localization & Navigation...'; ros2 launch nav2_bringup bringup_launch.py use_sim_time:=true map:=$MAP_FILE params_file:=$PARAMS_FILE; exec bash"
 
 # 3. RViz2
 CMD3="source /opt/ros/$ROS_DISTRO/setup.bash; source $WORKSPACE/install/setup.bash; echo '🪞 Launching RViz2...'; rviz2 -d $WORKSPACE/src/my_bot/config/view_robot.rviz; exec bash"
